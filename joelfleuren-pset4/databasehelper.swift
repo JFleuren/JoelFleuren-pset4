@@ -15,6 +15,7 @@ class DatabaseHelper {
     
     private let id = Expression<Int64>("id")
     private let subject = Expression<String?>("subject")
+    private let checks = Expression<Int64> ("checks")
     
     private var db: Connection?
     
@@ -45,6 +46,7 @@ class DatabaseHelper {
                 
                 t.column(id, primaryKey: .autoincrement)
                 t.column(subject)
+                t.column(checks)
             })
         } catch{
                 throw error
@@ -52,12 +54,12 @@ class DatabaseHelper {
     }
     
     func create(todo: String) throws {
-        let insert = list.insert(self.subject <- todo)
+        let insert = list.insert(self.subject <- todo, self.checks <- 0)
         
         do {
             let rowId  = try db!.run(insert)
             print (rowId)
-        } catch{
+        } catch{  
             throw error
             
         }
@@ -87,7 +89,7 @@ class DatabaseHelper {
                 let todo = Todo()
                 todo.id = todoItem[id]
                 todo.title = todoItem[subject]!
-                todo.checkend = false
+                todo.checkend = 0
                 
                 results.append(todo)
             }
@@ -102,7 +104,7 @@ class DatabaseHelper {
         let alice = list.filter(id == index)
         
         do {
-            try db!.run(alice.delete())
+            try db?.run(alice.delete())
             print("deleted succesfully")
         } catch {
             print("deleted failed!")
@@ -110,8 +112,16 @@ class DatabaseHelper {
         }
         
     }
-    
-    
+    func update(index: Int64, state: Int64) throws {
+        let list  = self.list.filter(id == index)
+        do {
+            try db!.run(list.update(self.checks <- state))
+            print("updated succesfully")
+        } catch {
+            print("updated failed!")
+            throw error
+        }
+    }
     
 }
 

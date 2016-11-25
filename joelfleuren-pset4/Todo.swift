@@ -14,6 +14,6 @@ class Todo {
     
     var id: Int64!
     var title = ""
-    var checkend = false
+    var checkend: Int64!
     
 }

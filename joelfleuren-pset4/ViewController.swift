@@ -71,9 +71,37 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print(todos[indexPath.row].id)
+        
+        if let cell = tableView.cellForRow(at: indexPath) {
+            if cell.accessoryType == .checkmark
+            {
+                cell.accessoryType = .none
+                todos[indexPath.row].checkend = 0
+                 updateRowState(index: indexPath.row)
+            }
+            else
+            {
+                cell.accessoryType = .checkmark
+                todos[indexPath.row].checkend = 1
+                 updateRowState(index: indexPath.row)
+            }
+            
+           
+        }
         
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    private func updateRowState(index: Int) {
+        
+        let id = todos[index].id
+        
+        do {
+            try db?.update(index: id!, state: todos[index].checkend)
+        } catch let error as NSError {
+            print(error.userInfo)
+        }
+        
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -103,6 +131,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         return [deleteAction]
     }
 }
+
 
 
 
